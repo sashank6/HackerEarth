@@ -1,7 +1,9 @@
 #include<iostream>
 #include<vector>
+#include<map>
 using namespace std;
 
+map<int,int> mymap;
 vector<int> merge(vector<int> v1,vector<int> v2)
 {
     vector<int> merged;
@@ -9,13 +11,29 @@ vector<int> merge(vector<int> v1,vector<int> v2)
     int one=0;
     int two=0;
     
+    int ct=0;
     while(one<v1.size() && two < v2.size())
     {
-        merged.push_back((v1[one]< v2[two])?v1[one++]:v2[two++]);
+        if(v1[one]<v2[two])
+        {
+            merged.push_back(v1[one]);
+            mymap[v1[one]]+=ct;
+            one++;
+        }
+        else
+        {
+            ct++;
+            merged.push_back(v2[two++]);
+        }
+        
     }
     
     while(one<v1.size())
-    merged.push_back(v1[one++]);
+    {
+    merged.push_back(v1[one]);
+    mymap[v1[one]]+=ct;
+    one++;
+    }
     
     while(two<v2.size())
     merged.push_back(v2[two++]);
@@ -24,57 +42,60 @@ vector<int> merge(vector<int> v1,vector<int> v2)
    
 }
 
-vector<int> msort(int low,int high,vector<int> v)
+vector<int> getSubvector(vector<int> v,int low,int high)
 {
-    if(low==high)
-    return v;
     
-    int mid=(low+high)/2;
-    
-    /*cout<<low<<","<<mid<<","<<high<<endl;
-    
-    vector<int> v1o(v.begin()+low,v.begin()+mid+1);
-    vector<int> v2o(v.begin()+mid+1,v.begin()+high);
-    */
-    cout<<v1o.size()<<endl;
-    cout<<v2o.size()<<endl;
-    
-    
-    vector<int> v1=v1o.size()>0?msort(low,mid,v1o):v1o;
-    vector<int> v2=v2o.size()>0?msort(mid+1,high,v2o):v2o;
-    
-    
-    
-    vector<int> merged=merge(v1,v2);
-    
-    
-    
-    return merged;
-    
+    vector<int> sub(v.begin()+low,v.begin()+high);
+    return sub;
     
 }
 
 
 
+vector<int> msort(vector<int> v)
+{
+    if(v.size()==1)
+    return v;
+    
+    int mid=(v.size())/2;
+    
+    vector<int> v1o=getSubvector(v,0,mid);
+    vector<int> v2o=getSubvector(v,mid,v.size());
+    
+    vector<int> v1=v1o.size()>0?msort(v1o):v1o;
+    vector<int> v2=v2o.size()>0?msort(v2o):v2o;
+   
+    vector<int> merged=merge(v1,v2);
+    
+    return merged;
+}
+
+
 int main()
 {
-    vector<int> v1;
-    vector<int> v2;
     
-    for(int i=10;i>=0;i-=2)
+    int tc;
+    cin>>tc;
+   
+    while(tc--)
     {
-        v1.push_back(i);
+    
+    int n;
+    cin>>n;
+    vector<int> gv(n);
+    
+    for(int i=0;i<n;i++)
+    cin>>gv[i];
+  
+    vector<int> sd=msort(gv);
+    
+    for(int i=0;i<gv.size();i++)
+    cout<<mymap[gv[i]]<<" ";
+    
+    cout<<endl;
+    
+    
     }
-    
-    for(int i=1;i<10;i+=2)
-    v2.push_back(i);
-    
-    
-    vector<int> sd=msort(0,v1.size(),v1);
-    
-    
-    for(int i=0;i<sd.size();i++)
-    cout<<sd[i]<<endl;
     
     
     return 0;
